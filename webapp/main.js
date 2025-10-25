@@ -25,12 +25,12 @@ const app = http.createServer(function(request, response){
         const description = 'Hello, Node.js';
         const list = template.list(filelist);
         const html = template.html(title, list, `<h2>${title}</h2><p>${description}</p>`, `<a href="/create">create</a>`);
-        response.writeHead(200);
+        response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
         response.end(html);
       });
     } else { // 파일 상세
       var filteredId = path.parse(queryData.id).base; // url 세탁(임의 파일 접근 금지) 
-      const filePath = path.join(filepath, filteredId); // filepath에 query string의 id를 합쳐 Path로 재정의
+      const filePath = path.join(filepath, encodeURIComponent(filteredId)); // filepath에 query string의 id를 합쳐 Path로 재정의
       fs.readFile(filePath, "utf8", function(err, description){ // readFile -> readdir -> 출력(async 처리이므로 readdir 마지막에 둬야함) 
         if(err){
           response.writeHead(404);
@@ -52,7 +52,7 @@ const app = http.createServer(function(request, response){
                <input type="submit" value="delete">
              </form>`
           );
-          response.writeHead(200);
+          response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
           response.end(html);
         });
       });
@@ -66,12 +66,12 @@ const app = http.createServer(function(request, response){
       const title = 'WEB - create';
       const list = template.list(filelist);
       const html = template.html(title, list,
-        `<form action="/create_process" method="post">
+        `<form action="/create_process" method="post" accept-charset="UTF-8">
            <p><input type="text" name="title" placeholder="title"></p>
            <p><textarea name="description" placeholder="description"></textarea></p>
            <p><input type="submit"></p>
          </form>`, '');
-      response.writeHead(200);
+      response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
       response.end(html);
     });
   } else if(pathname === '/create_process'){
@@ -92,7 +92,7 @@ const app = http.createServer(function(request, response){
     });
   } else if(pathname === '/update'){
     var filteredId = path.parse(queryData.id).base;
-    const filePath = path.join(filepath, filteredId);
+    const filePath = path.join(filepath, encodeURIComponent(filteredId));
     fs.readFile(filePath, 'utf8', function(err, description){
       if(err){
         response.writeHead(404);
@@ -106,13 +106,13 @@ const app = http.createServer(function(request, response){
         const title = queryData.id;
         const list = template.list(filelist);
         const html = template.html(title, list,
-          `<form action="/update_process" method="post">
+          `<form action="/update_process" method="post" accept-charset="UTF-8">
              <input type="hidden" name="id" value="${title}">
              <p><input type="text" name="title" placeholder="title" value="${title}"></p>
              <p><textarea name="description" placeholder="description">${description}</textarea></p>
              <p><input type="submit"></p>
            </form>`, '');  // 수정이므로 값이 미리 존재해야함. query string으로 value 속성 활용
-        response.writeHead(200);
+        response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
         response.end(html);
       });
     });
