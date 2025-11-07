@@ -5,3 +5,6 @@
 
 
 webapp node.js 구현 연습, render deploy
+
+
+main.js node.js용 주석 완료(기초 이해 주석)
