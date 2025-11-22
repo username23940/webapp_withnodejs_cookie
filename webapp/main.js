@@ -17,6 +17,13 @@ function authIsOwner(request, response) {
   };
   return isOwner;
 }
+function authStatusUI(request, response) {
+  var authStatusUI = '<a href="/login">login</a>'; // logout UI 제공
+  if (authIsOwner(request, response)){
+    <a href="/logout_process">logout</a>
+  }
+  return authStatusUI;
+}
 
 
 // 데이터 폴더 절대 경로
@@ -39,7 +46,7 @@ const app = http.createServer(function(request, response){
         const title = 'Welcome';
         const description = 'Hello, Node.js';
         const list = template.list(filelist);
-        const html = template.html(title, list, `<h2>${title}</h2><p>${description}</p>`, `<a href="/create">create</a>`);
+        const html = template.html(title, list, `<h2>${title}</h2><p>${description}</p>`, `<a href="/create">create</a>`, authStatusUI(request, response)); // 함수화
         response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
         response.end(html);
       });
@@ -65,7 +72,7 @@ const app = http.createServer(function(request, response){
              <form action="/delete_process" method="post" onsubmit="return confirm('really?');">
                <input type="hidden" name="id" value="${title}">
                <input type="submit" value="delete">
-             </form>`
+             </form>`, authStatusUI(request, response)
           );
           response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
           response.end(html);
@@ -73,6 +80,10 @@ const app = http.createServer(function(request, response){
       });
     }
   } else if(pathname === '/create'){ // 다른 기능
+    if(authIsOwner(response, request) === false) {
+      response.end('Login required');
+      return false ; // createServer의 콜백함수 종료
+    }
     fs.readdir(filepath, function(err, filelist){
       if(err){
         response.writeHead(500);
@@ -85,7 +96,7 @@ const app = http.createServer(function(request, response){
            <p><input type="text" name="title" placeholder="title(only en)"></p>
            <p><textarea name="description" placeholder="description(only en)"></textarea></p>
            <p><input type="submit"></p>
-         </form>`, '');
+         </form>`, '', authStatusUI(request, response));
       response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
       response.end(html);
     });
@@ -106,6 +117,10 @@ const app = http.createServer(function(request, response){
       });
     });
   } else if(pathname === '/update'){
+    if(authIsOwner(response, request) === false) {
+      response.end('Login required');
+      return false ; // createServer의 콜백함수 종료
+    }
     var filteredId = path.parse(queryData.id).base;
     const filePath = path.join(filepath, encodeURIComponent(filteredId));
     fs.readFile(filePath, 'utf8', function(err, description){
@@ -126,7 +141,7 @@ const app = http.createServer(function(request, response){
              <p><input type="text" name="title" placeholder="title(only en)" value="${title}"></p>
              <p><textarea name="description" placeholder="description(only en)">${description}</textarea></p>
              <p><input type="submit"></p>
-           </form>`, '');  // 수정이므로 값이 미리 존재해야함. query string으로 value 속성 활용
+           </form>`, '', authStatusUI(request, response));  // 수정이므로 값이 미리 존재해야함. query string으로 value 속성 활용
         response.writeHead(200, {'Content-Type':'text/html; charset=utf-8'});
         response.end(html);
       });
@@ -155,6 +170,10 @@ const app = http.createServer(function(request, response){
       });
     });
   } else if(pathname === '/delete_process'){
+    if(authIsOwner(response, request) === false) {
+      response.end('Login required');
+      return false ; // createServer의 콜백함수 종료
+    }
     let body = '';
     request.on('data', chunk => { body += chunk; });
     request.on('end', () => {
@@ -201,10 +220,14 @@ const app = http.createServer(function(request, response){
       else {
         response.end('who?');
       }
-  } else {
-    response.writeHead(404);
-    response.end('Not Found');
-  }
+  } else if ( pathname === '/logout_process') {
+    let body = '';
+    request.on('data', chunk => { body += chunk; });  
+    const post = qs.parse(body);
+    response.writeHead(302, { 
+                       'Set-Cookie':[`email=; Max-Age=0`, `password=; Max-Age=0`],  
+                        Location: '/'});
+    response.end();  
 });
 
 app.listen(3000, '0.0.0.0', () => {
