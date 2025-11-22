@@ -4,6 +4,20 @@ const url = require('url');
 const qs = require('querystring');
 const path = require('path');
 const template = require('./lib/template.js');
+const cookie = require('cookie');
+
+function authIsOwner(request, response) {
+  var isOwner=false; // 로그인 여부 확인 기본값은 False
+  var cookies = {}
+  if(request.headers.cookie) { // cookie 값 없으면 에러 나니 조건문. undefined 아닌 어떤 값이 있으면 True로 인식
+    var cookies = cookie.parse(request.headers.cookie);
+  };
+  if (cookies.email==='hi@naver.com' && cookies.password ==='1111') { // 객체 접근
+    isOwner = true;
+  };
+  return isOwner;
+}
+
 
 // 데이터 폴더 절대 경로
 const filepath = path.join(__dirname, "data"); // data 폴더의 경로를 변수로 설정
@@ -12,7 +26,8 @@ const app = http.createServer(function(request, response){
   const _url = request.url;
   const queryData = url.parse(request.url, true).query;
   const pathname = url.parse(_url, true).pathname; // query string 제외
-
+  var isOwner = authIsOwner(request, response); // 함수화
+  
   if(pathname === '/'){
     if(!queryData.id){ // 홈. 빈문자열 false 반환 + ! = True
       fs.readdir(filepath, function(err, filelist){
