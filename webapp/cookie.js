@@ -2,7 +2,7 @@ var http = require('http');
 var cookie = require('cookie');
 
 http.createServer(function(request, response){
-    // console.log(request.headers.cookie);
+    // console.log(request.headers.cookie); > undefined에서 cookie.parser 실행하면 오류로 서버 멈출 수도 있음
     var cookies = {};
     if(request.headers.cookie !== undefined){
         cookies = cookie.parse(request.headers.cookie);
