@@ -9,8 +9,8 @@ http.createServer(function(request, response){
     }
     console.log(cookies);
     response.writeHead(200, {
-        'Set-Cookie':['yummy_cookie=choco', 'tasty_cookie=strawberry',
-                     `Permanent=cookies; Max-Age=${60*60*24*30}`], // 30일
+        'Set-Cookie':['yummy_cookie=choco', 'tasty_cookie=strawberry'],
+                     `Permanent=cookies; Max-Age=${60*60*24*30}`, // 30일
                       'Secure=Secure; Secure' // key = value; Secure
                       'HttpOnly=HttpOnly; HttpOnly' // 마찬가지
                     'Path=Path; Path=/cookie', //  /cookie에만 살아있는 쿠키
