@@ -1,5 +1,3 @@
-
-
 // template 객체
 module.exports = {
   html: function(_title, _list, _body, _control, authStatusUI = '<a href="/login">login</a>'){ // authStatusUI는 기본 매개변수로 매개변수 따로 안들어오면 login 화면 
