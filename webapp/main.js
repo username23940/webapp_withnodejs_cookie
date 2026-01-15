@@ -20,7 +20,7 @@ function authIsOwner(request, response) {
 function authStatusUI(request, response) {
   var authStatusUI = '<a href="/login">login</a>'; // logout UI 제공
   if (authIsOwner(request, response)){
-    res.write(`<a href="/logout_process">logout</a>`);
+    return `<a href="/logout_process">logout</a>`;
   }
   return authStatusUI;
 }
@@ -80,7 +80,7 @@ const app = http.createServer(function(request, response){
       });
     }
   } else if(pathname === '/create'){ // 다른 기능
-    if(authIsOwner(response, request) === false) {
+    if(authIsOwner(request, response) === false) { // req, res 순서로 되어야 cookie 읽을 수 있음
       response.end('Login required');
       return false ; // createServer의 콜백함수 종료
     }
@@ -117,7 +117,7 @@ const app = http.createServer(function(request, response){
       });
     });
   } else if(pathname === '/update'){
-    if(authIsOwner(response, request) === false) {
+    if(authIsOwner(request, response) === false) {
       response.end('Login required');
       return false ; // createServer의 콜백함수 종료
     }
@@ -170,7 +170,7 @@ const app = http.createServer(function(request, response){
       });
     });
   } else if(pathname === '/delete_process'){
-    if(authIsOwner(response, request) === false) {
+    if(authIsOwner(request, response) === false) {
       response.end('Login required');
       return false ; // createServer의 콜백함수 종료
     }
@@ -210,16 +210,18 @@ const app = http.createServer(function(request, response){
       });
   } else if (pathname === '/login_process') {
     let body = '';
-    request.on('data', chunk => { body += chunk; });  
-    const post = qs.parse(body);
+    request.on('data', chunk => { body += chunk; });  // data 이벤트 끝나기 전에 parse 실행되므로(비동기화) -> end 이벤트 안에서 처리(비동기 완료 시점 기준으로 로직 분기)
+    request.on('end', () => {
+      const post = qs.parse(body);
       if (post.email==='hi@naver.com' && post.password ==='1111') {
         response.writeHead(302, { 
                            'Set-Cookie':[`email=${post.email}`, `password=${post.password}`],  
                             Location: '/'});
-      response.end();  
-      } else {
-        response.end('who?');
-      }
+        response.end();  
+        } else {
+          response.end('who?');
+        }
+    });
   } else if ( pathname === '/logout_process') {
     let body = '';
     request.on('data', chunk => { body += chunk; });  
@@ -233,3 +235,5 @@ const app = http.createServer(function(request, response){
 app.listen(3000, '0.0.0.0', () => {
   console.log('Server listening on port 3000');
 });
+
+} // createserver 닫
