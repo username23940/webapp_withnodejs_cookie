@@ -20,7 +20,7 @@ function authIsOwner(request, response) {
 function authStatusUI(request, response) {
   var authStatusUI = '<a href="/login">login</a>'; // logout UI 제공
   if (authIsOwner(request, response)){
-    <a href="/logout_process">logout</a>
+    res.write(`<a href="/logout_process">logout</a>`);
   }
   return authStatusUI;
 }
