@@ -217,7 +217,7 @@ const app = http.createServer(function(request, response){
                            'Set-Cookie':[`email=${post.email}`, `password=${post.password}`],  
                             Location: '/'});
       response.end();  
-      else {
+      } else {
         response.end('who?');
       }
   } else if ( pathname === '/logout_process') {
