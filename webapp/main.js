@@ -25,11 +25,15 @@ function authStatusUI(request, response) {
   return authStatusUI;
 }
 
+console.log('🔥 main.js started');
 
 // 데이터 폴더 절대 경로
 const filepath = path.join(__dirname, "data"); // data 폴더의 경로를 변수로 설정
 
 const app = http.createServer(function(request, response){
+
+  console.log('📩 request received:', request.url);
+  
   const _url = request.url;
   const queryData = url.parse(request.url, true).query;
   const pathname = url.parse(_url, true).pathname; // query string 제외
@@ -231,6 +235,8 @@ const app = http.createServer(function(request, response){
                         Location: '/'});
     response.end();  
 };
+
+console.log('🚀 before listen')
 
 app.listen(3000, '0.0.0.0', () => {
   console.log('Server listening on port 3000');
