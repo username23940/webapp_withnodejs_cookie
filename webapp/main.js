@@ -3,7 +3,7 @@ const fs = require('fs');
 const url = require('url');
 const qs = require('querystring');
 const path = require('path');
-const template = require('./lib/template.js');
+// const template = require('./lib/template.js');
 const cookie = require('cookie');
 
 function authIsOwner(request, response) {
@@ -40,6 +40,7 @@ const app = http.createServer(function(request, response){
   var isOwner = authIsOwner(request, response); // 함수화
   
   if(pathname === '/'){
+    response.end('ok');
     if(!queryData.id){ // 홈. 빈문자열 false 반환 + ! = True
       fs.readdir(filepath, function(err, filelist){
         if(err){ // 모든 async 함수에 오류 처리 필요
