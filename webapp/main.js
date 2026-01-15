@@ -228,7 +228,7 @@ const app = http.createServer(function(request, response){
                        'Set-Cookie':[`email=; Max-Age=0`, `password=; Max-Age=0`],  
                         Location: '/'});
     response.end();  
-});
+};
 
 app.listen(3000, '0.0.0.0', () => {
   console.log('Server listening on port 3000');
